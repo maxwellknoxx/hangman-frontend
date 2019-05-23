@@ -1,28 +1,62 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <nav>
+      <div class="nav-wrapper">
+        <a href="#" class="brand-logo center">Hangman</a>
+        <ul ul id="nav-mobile" class="left hide-on-med-and-down"></ul>
+      </div>
+    </nav>
+    <ul>
+      <li v-for="category in categories" :key="category.id">
+        <router-link :to=" '/hangman/' + category.id ">{{ category.categoryName }}</router-link>
+      </li>
+    </ul>
+    <hr>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Service from "./services/hangmanServices";
 
 export default {
-  name: 'app',
-  components: {
-    HelloWorld
+  data() {
+    return {
+      categories: []
+    };
+  },
+
+  created() {
+    Service.findAllCategory().then(response => {
+      this.categories = response.data.listData;
+    });
   }
-}
+};
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333333;
+}
+
+li {
+  float: left;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+}
+
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 16px;
+  text-decoration: none;
+}
+
+li a:hover {
+  background-color: #111111;
 }
 </style>
