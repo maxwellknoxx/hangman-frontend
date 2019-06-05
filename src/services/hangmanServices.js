@@ -2,6 +2,10 @@ import { http } from './config'
 
 export default {
 
+    play: (id) => {
+        return http.get('word/play/' + id)
+    },
+
     findAllWordsByCategory: (id) => {
         return http.get('word/findAllByCategoryId/' + id)
     }, 
@@ -12,6 +16,14 @@ export default {
 
     findAllCategory: () => {
         return http.get('category/findAll')
+    },
+
+    verifyLetter: (playingWord) => {
+        return http.post('word/verifyLetter', playingWord)
+    },
+
+    guessWord: (playingWord) => {
+        return http.post('word/guessWord', playingWord)
     }
 
 }

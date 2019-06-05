@@ -1,14 +1,23 @@
 <template>
   <div id="app">
     <div class="game">
+      <form @submit.prevent="verifyLetter">
     <h1>{{ category.categoryName }}</h1>
-    <h2>{{ computedHiddeWord }}</h2>
+    <h2>{{ playingWord.currentWord }}</h2>
+    <h3> {{ message }} </h3>
     
-        <input type="text" v-model="typedLetter" required>
+        <input type="text" name="playing" v-model="playingWord.letter" required>
         <button class="waves-effect waves-light btn-small">
           Check
           <i class="material-icons left">check</i>
         </button>
+        <BR/>
+        <BR/>
+        <button class="waves-effect waves-light btn-small" @click="guessWord()">
+          Guess word
+          <i class="material-icons left">check</i>
+        </button>
+      </form>
     </div>
   </div>
 </template>
@@ -20,42 +29,54 @@ import Services from "../services/hangmanServices";
 export default {
   data() {
     return {
+      playingWord: {
+        playingWord: "",
+        letter: "",
+        currentWord: "",
+        guessWord: "",
+        status: ""
+      },
       id: this.$route.params.data,
       category: "",
-      hiddenWord: " ",
-      words: []
+      message: ""
     };
   },
 
   mounted() {
-    this.findAllWordsByCategory();
     this.findCategoryById();
+    this.play();
   },
 
   methods: {
-    findAllWordsByCategory() {
-      Services.findAllWordsByCategory(this.id).then(response => {
-        this.words = response.data.listData;
-        console.log(this.words[0].word)
-      });
+
+    play() {
+      Services.play(this.id).then(response => {
+        this.playingWord = response.data.data;
+      })
+    },
+
+    verifyLetter() {
+      Services.verifyLetter(this.playingWord).then(response => {
+        this.playingWord = response.data.data;
+        this.playingWord.letter = "";
+      })
+    },
+
+    guessWord() {
+      this.playingWord.guessWord = this.playingWord.letter;
+      Services.guessWord(this.playingWord).then(response => {
+        this.playingWord = response.data.data;
+        if (this.playingWord.status) {
+          this.playingWord.currentWord = this.playingWord.playingWord;
+          this.message = response.data.message;
+        }
+      })
     },
 
     findCategoryById() {
       Services.findCategoryById(this.id).then(response => {
         this.category = response.data.data;
       });
-    }
-  },
-
-  computed: {
-    // a computed getter
-    computedHiddeWord: function() {
-      var i;
-      var hidden = " ";
-      for (i = 1; i <= this.words[0].word.length; i++) {
-        this.hiddenWord += "-";
-      }
-      return this.hiddenWord;
     }
   }
 };
