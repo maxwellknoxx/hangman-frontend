@@ -10,7 +10,7 @@ Vue.use(VueRouter)
 const routes = [
 
    { path: '/hangman/:data', component: hangman },
-   { path: '/home', component: home }
+   { path: '/', component: home }
 
 ]
 
