@@ -15,7 +15,7 @@ export default {
 <style>
 
 h2 {
-  font: 70px Tahoma, Helvetica, Arial, Sans-Serif;
+  font: 50px Tahoma, Helvetica, Arial, Sans-Serif;
   text-align: center;
 }
 

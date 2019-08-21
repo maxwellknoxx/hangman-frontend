@@ -11,7 +11,6 @@
         <router-link :to=" '/hangman/' + category.id ">{{ category.categoryName }}</router-link>
       </li>
     </ul>
-    <hr>
     <router-view :key="$route.fullPath"></router-view>
   </div>
 </template>

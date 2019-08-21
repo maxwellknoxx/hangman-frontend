@@ -15,7 +15,7 @@
           required
           :disabled="!this.counter"
           v-if="!this.isGameOver"
-        >
+        />
         <button
           class="waves-effect waves-light btn-small"
           :disabled="!this.counter"
@@ -24,22 +24,22 @@
           Check
           <i class="material-icons left">check</i>
         </button>
-        <BR/>
-        <BR/>
-        <button
-          class="waves-effect waves-light btn-small"
-          @click="guessWord()"
-          :disabled="!this.counter"
-          v-if="!this.isGameOver"
-        >
-          Guess word
-          <i class="material-icons left">check</i>
-        </button>
-        <button class="waves-effect waves-light btn-small" @click="play()" v-if="this.isGameOver">
-          New game
-          <i class="material-icons left">check</i>
-        </button>
+        <BR />
+        <BR />
       </form>
+      <button
+        class="waves-effect waves-light btn-small"
+        @click="guessWord()"
+        :disabled="!this.counter"
+        v-if="!this.isGameOver"
+      >
+        Try to guess word
+        <i class="material-icons left">check</i>
+      </button>
+      <button class="waves-effect waves-light btn-small" @click="play()" v-if="this.isGameOver">
+        New game
+        <i class="material-icons left">check</i>
+      </button>
     </div>
   </div>
 </template>
@@ -61,7 +61,7 @@ export default {
       id: this.$route.params.data,
       category: "",
       message: "",
-      counter: 2,
+      counter: 5,
       isGameOver: false
     };
   },
@@ -76,39 +76,46 @@ export default {
   methods: {
     play() {
       Services.play(this.id).then(response => {
-        this.start();
-        this.playingWord = response.data.data;
-        console.log(this.playingWord);
+        if (response !== false) {
+          this.start();
+          this.playingWord = response.data.data;
+        } else {
+          this.showMessage("Please, try again");
+        }
       });
     },
 
     start() {
       this.isGameOver = false;
-      this.counter = 2;
+      this.counter = 5;
       this.message = "";
       this.playingWord.letter = "";
     },
 
     verifyLetter() {
       Services.verifyLetter(this.playingWord).then(response => {
-        if (!response.data.status) {
-          this.counter = this.counter - 1;
-          if (this.counter == 0) {
-            this.gameOver("You lose");
+        this.playingWord = response.data.data;
+        if (this.playingWord.wordCompleted === false) {
+          if (this.playingWord.status === false) {
+            this.counter = this.counter - 1;
+            if (this.counter === 0) {
+              this.gameOver("You lose");
+            }
+          } else {
+            this.playingWord = response.data.data;
+            this.playingWord.letter = "";
           }
         } else {
-          this.playingWord = response.data.data;
-          this.playingWord.letter = "";
+          this.gameOver(response.data.message);
         }
       });
     },
 
     guessWord() {
       this.playingWord.guessWord = prompt("What is the word?");
-      console.log(this.playingWord.guessWord);
       Services.guessWord(this.playingWord).then(response => {
         this.playingWord = response.data.data;
-        if (this.playingWord.status) {
+        if (this.playingWord.wordCompleted === true) {
           this.playingWord.currentWord = this.playingWord.playingWord;
           this.gameOver(response.data.message);
         } else {
