@@ -1,5 +1,5 @@
-//import { http } from './config'
-import { http } from './config.local'
+import { http } from './config'
+//import { http } from './config.local'
 
 export default {
 
