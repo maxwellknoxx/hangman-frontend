@@ -95,20 +95,34 @@ export default {
     verifyLetter() {
       Services.verifyLetter(this.playingWord).then(response => {
         this.playingWord = response.data.data;
-        if (this.playingWord.wordCompleted === false) {
-          if (this.playingWord.status === false) {
-            this.counter = this.counter - 1;
-            if (this.counter === 0) {
-              this.gameOver("You lose");
-            }
-          } else {
-            this.playingWord = response.data.data;
-            this.playingWord.letter = "";
+        var msg = response.data.message;
+        if (
+          this.isWordCompleted(msg) === false &&
+          this.isValidLetter(response) === false
+        ) {
+          if (this.counter === 0) {
+            this.gameOver("You lose");
           }
-        } else {
-          this.gameOver(response.data.message);
         }
       });
+    },
+
+    isWordCompleted(msg) {
+      if (this.playingWord.wordCompleted === true) {
+        this.gameOver(msg);
+        return true;
+      }
+      return false;
+    },
+
+    isValidLetter(response) {
+      if (this.playingWord.status === true) {
+        this.playingWord.letter = "";
+        return true;
+      }
+      this.counter = this.counter - 1;
+      this.playingWord.letter = "";
+      return false;
     },
 
     guessWord() {
@@ -117,15 +131,14 @@ export default {
         this.playingWord = response.data.data;
         if (this.playingWord.wordCompleted === true) {
           this.playingWord.currentWord = this.playingWord.playingWord;
-          this.gameOver(response.data.message);
-        } else {
-          this.showMessage(response.data.message);
         }
+        this.gameOver(response.data.message);
       });
     },
 
     gameOver(messageToShow) {
       this.showMessage(messageToShow);
+      this.playingWord.currentWord = "";
       this.isGameOver = true;
     },
 
